@@ -1,0 +1,23 @@
+{
+  "name": "df-client-maps-tauri",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tauri-apps/cli": "^2.8.4",
+    "svelte": "^5.39.6",
+    "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "maplibre-gl": "^5.8.0"
+  }
+}
