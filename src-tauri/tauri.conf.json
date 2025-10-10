@@ -5,7 +5,7 @@
   "identifier": "com.tauri.dev",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://localhost:3000",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
@@ -13,14 +13,14 @@
     "windows": [
       {
         "title": "DF-Client",
-        "width": 800,
+        "width": 860,
         "height": 860,
         "resizable": true,
         "fullscreen": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: tauri: http: https: ws: wss:; connect-src 'self' ipc: tauri: http: https: ws: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' 'unsafe-hashes'; img-src 'self' data: blob: http: https:; font-src 'self' data: http: https:; frame-src 'self' http: https:; worker-src 'self' blob:; child-src 'self' http: https:"
     }
   },
   "bundle": {

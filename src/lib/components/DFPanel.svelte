@@ -1,14 +1,25 @@
-<div class="container">hello</div>
+<script>
+    import ControlPanel from "./ControlPanel.svelte";
+    import DFPlot from "./DFPlot.svelte";
+    import StatusDF from "./StatusDF.svelte";
+</script>
+
+<div class="container">
+    <StatusDF />
+    <DFPlot />
+    <ControlPanel />
+</div>
 
 <style>
     .container {
         position: absolute;
-        top: 16px;
-        right: 16px;
-        padding: 16px;
-        width: 200px;
-        height: 100px;
-        background-color: rgba(147, 90, 90, 0.8);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        top: 8px;
+        right: 8px;
+        width: 400px;
+        background-color: transparent;
         border: 1px solid #ccc;
         border-radius: 4px;
     }
