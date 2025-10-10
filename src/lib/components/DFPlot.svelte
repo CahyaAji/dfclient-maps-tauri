@@ -1,8 +1,14 @@
+<script>
+    import RelativePlot from "./RelativePlot.svelte";
+</script>
+
 <div class="container">
     <div class="title">
         <div>DF Plot</div>
     </div>
-    <div class="content"></div>
+    <div class="content">
+        <RelativePlot />
+    </div>
 </div>
 
 <style>
