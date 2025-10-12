@@ -8,6 +8,10 @@
         display: flex;
         width: 260px;
         height: 260px;
-        background-color: orange;
+        background-image: url("/src/assets/relative_circle.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: rgba(4, 61, 15, 0.5);
+        border-radius: 50%;
     }
 </style>
