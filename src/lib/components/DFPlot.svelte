@@ -3,9 +3,6 @@
 </script>
 
 <div class="container">
-    <div class="title">
-        <div>DF Plot</div>
-    </div>
     <div class="content">
         <RelativePlot />
     </div>
@@ -13,8 +10,6 @@
 
 <style>
     .container {
-        width: 400px;
-        padding: 2px 8px 16px 8px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -25,5 +20,11 @@
         width: 100%;
         padding: 4px;
         color: white;
+        font-size: 13pt;
+        background-color: rgba(4, 61, 15, 0.5);
+        border-radius: 10px 10px 0 0;
+    }
+    .content {
+        padding: 8px 0;
     }
 </style>

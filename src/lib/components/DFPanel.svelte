@@ -18,7 +18,7 @@
         gap: 8px;
         top: 8px;
         right: 8px;
-        width: 400px;
+        width: 360px;
         background-color: transparent;
         border: 1px solid #ccc;
         border-radius: 4px;

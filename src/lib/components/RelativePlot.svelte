@@ -6,8 +6,8 @@
 <style>
     .container {
         display: flex;
-        width: 260px;
-        height: 260px;
+        width: 250px;
+        height: 250px;
         background-image: url("/src/assets/relative_circle.png");
         background-repeat: no-repeat;
         background-size: cover;

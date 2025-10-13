@@ -1,5 +1,4 @@
 <div class="container">
-    <div class="title">Frequency</div>
     <div class="content">
         <div class="input-field">
             <div class="label">Frequency</div>
@@ -47,15 +46,6 @@
         color: white;
         display: flex;
         flex-direction: column;
-    }
-    .title {
-        font-size: large;
-        border-bottom: 2px solid white;
-        padding-bottom: 4px;
-        background-color: rgba(4, 61, 15, 0.5);
-        border-radius: 10px 10px 0 0;
-        padding-left: 8px;
-        padding-top: 4px;
     }
     .content {
         margin-top: 2px;
