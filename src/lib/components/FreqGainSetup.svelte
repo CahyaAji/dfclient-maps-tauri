@@ -50,13 +50,14 @@
     .content {
         margin-top: 2px;
         margin-left: 8px;
+        margin-right: 8px;
     }
     .input-field {
         display: flex;
         padding: 4px 0 8px 0;
     }
     .input-field > button {
-        padding: 4px 10px;
+        padding: 4px 16px;
     }
     .input-field > input {
         padding: 4px 8px;
@@ -64,5 +65,7 @@
     }
     .label {
         min-width: 80px;
+        align-self: center;
+        padding: 4px 0;
     }
 </style>
