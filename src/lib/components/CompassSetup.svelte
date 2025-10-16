@@ -1,9 +1,39 @@
-<div>In a development</div>
+<div class="container">
+    <div class="compass-display">
+        <div class="circle"></div>
+        <div class="cmps-value">--</div>
+    </div>
+    <div class="compass-correction">ini correction</div>
+</div>
 
 <style>
-    div {
-        align-content: center;
-        margin: auto;
-        height: 80px;
+    .container {
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+    }
+    .compass-display {
+        display: flex;
+        flex-direction: column;
+    }
+    .circle {
+        height: 100px;
+        width: 100px;
+        background-color: rgba(4, 61, 15, 0.5);
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        margin: 4px auto 0;
+        border-radius: 50%;
+        border: 1px solid white;
+    }
+    .cmps-value {
+        width: 80px;
+        background-color: pink;
+        margin: 4px auto 8px;
+        text-align: center;
+        padding: 4px 8px;
+    }
+    .compass-correction {
+        background-color: pink;
     }
 </style>
