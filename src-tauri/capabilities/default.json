@@ -6,6 +6,19 @@
     "main"
   ],
   "permissions": [
-    "core:default"
+    "core:default",
+    {
+      "identifier": "core:webview:default",
+      "permissions": [
+        "allow-open-urls",
+        "allow-navigation",
+        "allow-window",
+        "allow-clipboard-read-text",
+        "allow-clipboard-write-text",
+        "allow-file-drop",
+        "allow-devtools",
+        "allow-geolocation"
+      ]
+    }
   ]
 }
