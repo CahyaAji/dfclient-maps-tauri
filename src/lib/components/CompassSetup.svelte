@@ -24,14 +24,17 @@
         display: flex;
         margin: 4px auto 0;
         border-radius: 50%;
-        border: 1px solid white;
+        border: 2px solid white;
     }
     .cmps-value {
         width: 80px;
-        background-color: pink;
+        background-color: rgba(4, 61, 15, 0.5);
+        border: 2px solid white;
+        border-radius: 10px;
         margin: 4px auto 8px;
         text-align: center;
         padding: 4px 8px;
+        color: white;
     }
     .compass-correction {
         background-color: pink;
