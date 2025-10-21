@@ -5,19 +5,19 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
+    "http:default",
     {
-      "identifier": "core:webview:default",
-      "permissions": [
-        "allow-open-urls",
-        "allow-navigation",
-        "allow-window",
-        "allow-clipboard-read-text",
-        "allow-clipboard-write-text",
-        "allow-file-drop",
-        "allow-devtools",
-        "allow-geolocation",
-        "allow-http-request",
-        "allow-cors"
+      "identifier": "http:allow-fetch",
+      "allow": [
+        {
+          "url": "https://jsonplaceholder.typicode.com/*"
+        },
+        {
+          "url": "http://localhost:3000/*"
+        },
+        {
+          "url": "http://192.168.17.17:*"
+        }
       ]
     }
   ]
