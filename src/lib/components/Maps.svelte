@@ -139,11 +139,27 @@
 
     console.log("Updating user location on map...", user, angle);
 
-    if (!user || angle === null) return;
+    if (!user || angle === null || angle === undefined || isNaN(angle)) {
+      if (map) {
+        const lineSrc = map.getSource(
+          "bearing-line"
+        ) as maplibregl.GeoJSONSource;
+        if (lineSrc) {
+          lineSrc.setData({
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "LineString",
+              coordinates: [],
+            },
+          });
+        }
+      }
+      return;
+    }
 
     const now = Date.now();
     const elapsed = now - lastlocUpdate;
-
     if (elapsed < 500) return;
     lastlocUpdate = now;
 
@@ -153,7 +169,6 @@
     const endPoint = destinationPoint(lat, lon, angle, LINE_LENGTH);
     const endLine = [endPoint.lon, endPoint.lat];
 
-    //smooth draw
     requestAnimationFrame(() => {
       if (!map) return;
 
@@ -183,40 +198,6 @@
         });
       }
     });
-  });
-
-  //draw line
-  $effect(() => {
-    if (!map) return;
-
-    const userLoc = locationStore.data;
-    const angle = 45; // in degrees
-
-    if (!userLoc || angle === null) return;
-
-    const endPoint = destinationPoint(
-      userLoc.lat,
-      userLoc.lon,
-      angle,
-      LINE_LENGTH
-    );
-
-    const coords = [
-      [userLoc.lon, userLoc.lat],
-      [endPoint.lon, endPoint.lat],
-    ];
-
-    const src = map.getSource("bearing-line") as maplibregl.GeoJSONSource;
-    if (src) {
-      src.setData({
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: coords,
-        },
-      });
-    }
   });
 </script>
 
