@@ -1,7 +1,7 @@
 import { fetch } from "@tauri-apps/plugin-http";
 
-export const API_URL = "http://192.168.17.17:8087";
-// export const API_URL = "http://localhost:3000";
+// export const API_URL = "http://192.168.17.17:8087";
+export const API_URL = "http://localhost:3000";
 
 export const readDF = async () => {
   try {
