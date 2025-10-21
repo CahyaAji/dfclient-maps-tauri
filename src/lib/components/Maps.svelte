@@ -137,6 +137,8 @@
     const user = locationStore.data;
     const angle = dfStore.data?.heading;
 
+    console.log("Updating user location on map...", user, angle);
+
     if (!user || angle === null) return;
 
     const now = Date.now();
