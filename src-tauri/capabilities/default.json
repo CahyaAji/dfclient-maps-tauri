@@ -2,9 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "enables the default permissions",
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "core:default",
     {
@@ -17,7 +15,21 @@
         "allow-clipboard-write-text",
         "allow-file-drop",
         "allow-devtools",
-        "allow-geolocation"
+        "allow-geolocation",
+        {
+          "identifier": "http:default",
+          "allow": [
+            {
+              "url": "https://jsonplaceholder.typicode.com/*"
+            },
+            {
+              "url": "http://localhost:3000/*"
+            },
+            {
+              "url": "http://192.168.17.17:*"
+            }
+          ]
+        }
       ]
     }
   ]
