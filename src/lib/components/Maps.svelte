@@ -54,7 +54,7 @@
       style:
         "https://api.maptiler.com/maps/openstreetmap/style.json?key=fB2eDjoDg2nlel5Kw6ym",
       center: [110.4406, -7.7774],
-      zoom: 21,
+      zoom: 13,
       attributionControl: false,
     });
 
