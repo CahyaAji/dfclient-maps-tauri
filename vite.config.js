@@ -7,15 +7,15 @@ export default defineConfig({
   server: {
     port: 3001,
     strictPort: true,
-  },
-  proxy: {
-    "/api": {
-      target: "http://192.168.17.17:8087",
-      changeOrigin: true,
-    },
-    "/df": {
-      target: "ws://192.168.17.17:8087",
-      changeOrigin: true,
+    proxy: {
+      "/api": {
+        target: "http://192.168.17.17:8087",
+        changeOrigin: true,
+      },
+      "/df": {
+        target: "ws://192.168.17.17:8087",
+        changeOrigin: true,
+      },
     },
   },
   optimizeDeps: {
