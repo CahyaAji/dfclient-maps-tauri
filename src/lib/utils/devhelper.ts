@@ -1,30 +1,19 @@
-import type { ClientOptions } from "@tauri-apps/plugin-http";
-
 export function isTauri(): boolean {
-  return !!window.__TAURI__;
-}
-
-let tauriFetch:
-  | ((
-      input: URL | Request | string,
-      init?: RequestInit & ClientOptions
-    ) => Promise<Response>)
-  | ((arg0: any, arg1: {}) => any);
-if (isTauri()) {
-  const mod = await import("@tauri-apps/plugin-http");
-  tauriFetch = mod.fetch;
+  return typeof window !== "undefined" && "__TAURI__" in window;
 }
 
 /**
- * Unified fetch that works both in Tauri and browser dev mode
+ * Universal fetch that works both in Tauri and Browser.
  */
 export async function unifiedFetch(
-  url: URL | Request | string,
-  options: RequestInit & ClientOptions = {}
+  url: string,
+  options?: RequestInit
 ): Promise<Response> {
-  if (isTauri() && tauriFetch) {
-    return tauriFetch(url, options);
+  if (isTauri()) {
+    // Dynamically import inside function
+    const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
+    return await tauriFetch(url, options);
   } else {
-    return window.fetch(url, options);
+    return await window.fetch(url, options);
   }
 }
