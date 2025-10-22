@@ -1,5 +1,11 @@
-export function isTauri(): boolean {
-  return typeof window !== "undefined" && "__TAURI__" in window;
+export async function isTauriRuntime(): Promise<boolean> {
+  try {
+    // dynamic import — safe for both web and tauri
+    const tauri = await import("@tauri-apps/api/core");
+    return typeof tauri !== "undefined";
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -9,10 +15,19 @@ export async function unifiedFetch(
   url: string,
   options?: RequestInit
 ): Promise<Response> {
-  if (isTauri()) {
-    // Dynamically import inside function
-    const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
-    return await tauriFetch(url, options);
+  const inTauri = await isTauriRuntime();
+
+  if (inTauri) {
+    try {
+      const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
+      return await tauriFetch(url, options);
+    } catch (err) {
+      console.warn(
+        "Tauri plugin-http not available, falling back to browser fetch:",
+        err
+      );
+      return await window.fetch(url, options);
+    }
   } else {
     return await window.fetch(url, options);
   }
