@@ -27,6 +27,21 @@
       value = Number(value.toFixed(3));
     }
   }
+
+  //   improve
+  //   function handleInput(e) {
+  //   const target = e.target as HTMLInputElement;
+  //   const normalized = normalizeToDot(target.value);
+  //   if (target.value !== normalized) target.value = normalized;
+  //   // don’t set value yet — wait until blur
+  // }
+
+  // function handleBlur(e) {
+  //   const target = e.target as HTMLInputElement;
+  //   const normalized = normalizeToDot(target.value);
+  //   const num = parseFloat(normalized);
+  //   value = isNaN(num) ? 0 : Number(num.toFixed(3));
+  // }
 </script>
 
 <input
