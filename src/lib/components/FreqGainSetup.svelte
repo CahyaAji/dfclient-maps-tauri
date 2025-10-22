@@ -1,3 +1,113 @@
+<script lang="ts">
+  import { setAntenna, setFreqGainApi } from "../utils/api_handler.js";
+  import { signalState } from "../stores/signalState.svelte.js";
+
+  let inputFreqMhz = $state(0);
+  let errorMessage = $state("");
+  let isBusy = $state(false);
+  let errorTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  const currentStoreFreq = $derived(signalState.currentFreq);
+  //  const udpFreqHz = $derived(udpState.currentNumb);
+
+  // const displayFreqMhz = $derived(
+  //   isAutoMode && udpFreqHz > 0
+  //     ? Number((udpFreqHz / 1_000_000).toFixed(3))
+  //     : currentStoreFreq
+  // );
+  const isAutoMode = $derived(signalState.autoMode);
+
+  $effect.pre(() => {
+    if (!isAutoMode) {
+      inputFreqMhz = currentStoreFreq;
+    }
+  });
+
+  function showError(msg: string) {
+    errorMessage = msg;
+    if (errorTimeout) clearTimeout(errorTimeout);
+    errorTimeout = setTimeout(() => {
+      errorMessage = "";
+    }, 1500);
+  }
+
+  async function handleSetAntenna(antSpace: number) {
+    try {
+      const result = await setAntenna(antSpace);
+      if (!result.success) {
+        console.log("API call failed:", result.error);
+        return false;
+      }
+      console.log(`Antenna spacing set successfully: ${result.data}`);
+      return true;
+    } catch (error) {
+      console.log("Error setting antenna:", error);
+      return false;
+    }
+  }
+
+  async function handleFreqSet() {
+    if (isAutoMode || isBusy) return;
+    if (inputFreqMhz < 24.0 || inputFreqMhz > 1000.0) {
+      showError("Frequency must be between 24.0 and 1000.0 MHz");
+      return;
+    }
+
+    signalState.setFrequency(inputFreqMhz);
+    const antSpace = inputFreqMhz > 250 ? 0.25 : 0.45;
+    isBusy = true;
+
+    try {
+      const antennaOK = await handleSetAntenna(antSpace);
+      if (!antennaOK) showError("Error, Gagal mengatur antena");
+
+      const result = await setFreqGainApi({
+        center_freq: inputFreqMhz,
+        uniform_gain: signalState.currentGain,
+        ant_spacing_meters: antSpace,
+      });
+
+      if (!result.success) {
+        showError("Error, Gagal mengatur frekuensi");
+      } else {
+        console.log("Frequency and gain set successfully:", result.data);
+      }
+    } catch (err) {
+      console.error("Error in handleFreqSet:", err);
+      showError("Error, Gagal mengatur frekuensi");
+    } finally {
+      isBusy = false;
+    }
+  }
+
+  async function handleGainSet() {
+    if (isBusy) return;
+    isBusy = true;
+
+    const freq = signalState.currentFreq;
+    const antSpace = freq > 250 ? 0.25 : 0.45;
+
+    try {
+      const result = await setFreqGainApi({
+        center_freq: freq,
+        uniform_gain: signalState.currentGain,
+        ant_spacing_meters: antSpace,
+      });
+
+      if (!result.success) {
+        showError("Error, Gagal mengatur gain");
+      } else {
+        console.log("Gain set successfully:", result.data);
+      }
+    } catch (err) {
+      console.error("Error in handleGainSet:", err);
+      showError("Error, Gagal mengatur gain");
+    } finally {
+      isBusy = false;
+    }
+  }
+</script>
+
 <div class="container">
   <div class="content">
     <div class="input-field">
