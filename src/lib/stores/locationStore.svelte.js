@@ -1,3 +1,5 @@
+import { fetch } from "@tauri-apps/plugin-http";
+
 class LocationStore {
   data = $state(null);
   error = $state(null);
