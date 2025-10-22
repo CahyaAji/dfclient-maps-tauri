@@ -1,6 +1,7 @@
 <script lang="ts">
   import { setAntenna, setFreqGainApi } from "../utils/api_handler.js";
   import { signalState } from "../stores/signalState.svelte.js";
+  import DotNumberInput from "./DotNumberInput.svelte";
 
   let inputFreqMhz = $state(0);
   let errorMessage = $state("");
@@ -114,16 +115,33 @@
       <div class="label">Freq Mode</div>
       <div class="radio-group">
         <label class="radio-label">
-          <input type="radio" name="frequency-mode" /><span>Auto</span>
+          <input
+            type="radio"
+            name="frequency-mode"
+            checked={isAutoMode === true}
+            onchange={() => signalState.setAutoMode(true)}
+          />
+          <span>Auto</span>
         </label>
         <label class="radio-label">
-          <input type="radio" name="frequency-mode" /><span>Manual</span>
+          <input
+            type="radio"
+            name="frequency-mode"
+            checked={isAutoMode === false}
+            onchange={() => signalState.setAutoMode(false)}
+          />
+          <span>Manual</span>
         </label>
       </div>
     </div>
     <div class="input-field">
       <div class="label">Frequency</div>
-      <input type="text" />
+      {#if isAutoMode}
+        <DotNumberInput value={100} disabled readonly />
+      {:else}
+        <DotNumberInput bind:value={inputFreqMhz} />
+      {/if}
+      <span>MHz</span>
       <button>Set</button>
     </div>
     <div class="input-field">
@@ -178,17 +196,19 @@
     padding: 4px 0 8px 0;
   }
   .input-field > button {
-    padding: 4px 16px;
+    padding: 4px 18px;
+    margin-left: 2px;
   }
-  .input-field > input {
-    padding: 4px 8px;
-    width: 120px;
+  .input-field > span {
+    margin: 0 4px;
+    align-content: center;
   }
   .label {
     min-width: 80px;
     align-self: center;
     padding: 4px 0;
   }
+
   .radio-group {
     display: flex;
     gap: 10px;
