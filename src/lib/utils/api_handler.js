@@ -1,4 +1,5 @@
-import { fetch } from "@tauri-apps/plugin-http";
+// import { fetch } from "@tauri-apps/plugin-http";
+import { unifiedFetch as fetch } from "./devhelper";
 
 // export const API_URL = "http://192.168.17.17:8087";
 export const API_URL = "http://localhost:3000";

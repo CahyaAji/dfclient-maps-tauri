@@ -1,4 +1,5 @@
-import { fetch } from "@tauri-apps/plugin-http";
+// import { fetch } from "@tauri-apps/plugin-http";
+import { unifiedFetch as fetch } from "../utils/devhelper";
 
 class LocationStore {
   data = $state(null);
