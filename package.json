@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@tauri-apps/plugin-http": "^2.5.2",
+    "@tauri-apps/plugin-store": "^2.4.0",
     "maplibre-gl": "^5.8.0"
   }
 }
