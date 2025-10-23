@@ -65,7 +65,7 @@
   }
 
   .input-freq:disabled {
-    background-color: #333;
-    color: #888;
+    background-color: white;
+    color: black;
   }
 </style>
