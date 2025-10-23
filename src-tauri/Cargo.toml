@@ -1,9 +1,9 @@
 [package]
-name = "app"
+name = "DFClient"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
+description = "Monobs DF Client App."
+authors = ["CahyaAji"]
+license = "MIT"
 repository = ""
 edition = "2021"
 rust-version = "1.77.2"
@@ -25,3 +25,4 @@ tauri = { version = "2.8.5", features = ["devtools"] }
 tauri-plugin-log = "2"
 tauri-plugin-http = "2.5.2"
 tokio = {version = "1.48.0", features = ["net", "rt-multi-thread"] }
+tauri-plugin-store = "2.4.0"
