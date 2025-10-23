@@ -23,7 +23,7 @@ export async function unifiedFetch(
       return await tauriFetch(url, options);
     } catch (err) {
       console.warn(
-        "Tauri plugin-http not available, falling back to browser fetch:",
+        "Tauri plugin-http not available, falling back to browser fetch.",
         err
       );
       return await window.fetch(url, options);
