@@ -53,6 +53,11 @@ class LocationStore {
         if (err.code === err.POSITION_UNAVAILABLE) {
           this.fallbackIP();
         }
+
+        // error di linux & macos (no permission asked)
+        // if (err.code === err.PERMISSION_DENIED) {
+        //   this.fallbackIP();
+        // }
       },
       {
         enableHighAccuracy: true,
