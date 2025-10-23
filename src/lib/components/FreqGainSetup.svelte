@@ -1,6 +1,7 @@
 <script lang="ts">
   import { setAntenna, setFreqGainApi } from "../utils/api_handler.js";
   import { signalState } from "../stores/signalState.svelte.js";
+  import { udpState } from "../stores/udpStore.svelte.js";
   import DotNumberInput from "./DotNumberInput.svelte";
 
   let inputFreqMhz = $state(0);
@@ -9,14 +10,14 @@
   let errorTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const currentStoreFreq = $derived(signalState.currentFreq);
-  //  const udpFreqHz = $derived(udpState.currentNumb);
+  let isAutoMode = $derived(signalState.autoMode);
+  const udpFreqHz = $derived(udpState.currentNumb);
 
-  // const displayFreqMhz = $derived(
-  //   isAutoMode && udpFreqHz > 0
-  //     ? Number((udpFreqHz / 1_000_000).toFixed(3))
-  //     : currentStoreFreq
-  // );
-  const isAutoMode = $derived(signalState.autoMode);
+  const displayFreqMhz = $derived(
+    isAutoMode && udpFreqHz !== 0 && udpFreqHz > 0
+      ? Number((udpFreqHz / 1_000_000).toFixed(3))
+      : currentStoreFreq
+  );
 
   $effect.pre(() => {
     if (!isAutoMode) {
@@ -137,7 +138,7 @@
     <div class="input-field">
       <div class="label">Frequency</div>
       {#if isAutoMode}
-        <DotNumberInput value={100} disabled readonly />
+        <DotNumberInput value={displayFreqMhz} disabled readonly />
       {:else}
         <DotNumberInput bind:value={inputFreqMhz} />
       {/if}
