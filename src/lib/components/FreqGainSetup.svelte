@@ -142,11 +142,11 @@
         <DotNumberInput bind:value={inputFreqMhz} />
       {/if}
       <span>MHz</span>
-      <button>Set</button>
+      <button disabled={isAutoMode} onclick={handleFreqSet}>Set</button>
     </div>
     <div class="input-field">
       <div class="label">Gain</div>
-      <select>
+      <select bind:value={signalState.currentGain}>
         <option value={0}>0.0</option>
         <option value={0.9}>0.9</option>
         <option value={1.4}>1.4</option>
@@ -175,7 +175,7 @@
         <option value={48.0}>48.0</option>
         <option value={49.6}>49.6</option>
       </select>
-      <button>Set</button>
+      <button onclick={handleGainSet}>Set</button>
     </div>
   </div>
 </div>
