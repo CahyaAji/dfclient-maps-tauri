@@ -82,3 +82,20 @@ export const setAntenna = async (/** @type {number} */ antSpace) => {
     return { success: false, error: error.message };
   }
 };
+
+export const getDFSettings = async () => {
+  try {
+    const response = await fetch(`${API_URL}/api/settings`);
+    const result = await response.json();
+
+    const filteredResult = {
+      center_freq: result.center_freq,
+      uniform_gain: result.uniform_gain,
+      station_id: result.station_id,
+    };
+
+    return filteredResult;
+  } catch (error) {
+    throw error;
+  }
+};

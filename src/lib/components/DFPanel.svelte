@@ -5,7 +5,11 @@
   import StatusDF from "./StatusDF.svelte";
   import { udpState, udpStore } from "../stores/udpStore.svelte";
   import { signalState } from "../stores/signalState.svelte";
-  import { setAntenna, setFreqGainApi } from "../utils/api_handler";
+  import {
+    getDFSettings,
+    setAntenna,
+    setFreqGainApi,
+  } from "../utils/api_handler";
 
   let appInitialized = false;
   let frequencyDebounceTimer = null;
@@ -88,13 +92,13 @@
     try {
       // STEP 1: Always set antenna first
       console.log(
-        `Setting antenna spacing to ${antSpace}m for frequency ${newFreq}MHz`
+        `Setting antenna spacing to ${antSpace}m for frequency ${newFreq}MHz`,
       );
       antennaSuccess = await handleSetAntenna(antSpace);
 
       if (!antennaSuccess) {
         console.log(
-          "Antenna setting failed, but continuing with frequency setting"
+          "Antenna setting failed, but continuing with frequency setting",
         );
       }
 
@@ -105,7 +109,7 @@
         prevFreq = newFreq;
         retryCount = 0;
         console.log(
-          `All settings applied successfully - Antenna: ${antennaSuccess ? "OK" : "FAILED"}, Frequency: OK`
+          `All settings applied successfully - Antenna: ${antennaSuccess ? "OK" : "FAILED"}, Frequency: OK`,
         );
       } else {
         throw new Error("Frequency setting failed");
@@ -117,7 +121,7 @@
       if (retryCount < MAX_RETRIES) {
         retryCount++;
         console.log(
-          `Retrying entire process (attempt ${retryCount}/${MAX_RETRIES})`
+          `Retrying entire process (attempt ${retryCount}/${MAX_RETRIES})`,
         );
 
         setTimeout(
@@ -125,7 +129,7 @@
             isChangingFreq = false;
             handleSetFreq(newFreq, newGain);
           },
-          1000 + retryCount * 500
+          1000 + retryCount * 500,
         );
         return;
       } else {
@@ -180,7 +184,7 @@
     if (!Number.isFinite(freqInMhz) || Number.isNaN(freqInMhz)) {
       console.error(
         "Frequency conversion resulted in invalid number:",
-        freqInMhz
+        freqInMhz,
       );
       return;
     }
@@ -191,7 +195,7 @@
       "prevFreq:",
       prevFreq,
       "difference:",
-      Math.abs(freqInMhz - prevFreq)
+      Math.abs(freqInMhz - prevFreq),
     );
 
     const frequencyDifference = Math.abs(freqInMhz - prevFreq);
@@ -218,12 +222,12 @@
           "Calling handleSetFreq with:",
           freqInMhz,
           "gain:",
-          currentGain
+          currentGain,
         );
         handleSetFreq(freqInMhz, currentGain);
       } else {
         console.log(
-          "Conditions changed during debounce, skipping frequency update"
+          "Conditions changed during debounce, skipping frequency update",
         );
       }
 
@@ -251,8 +255,9 @@
     async function initialize() {
       appInitialized = true;
 
-      //1. Load ConfigStore
-      //2. Start DFStore
+      //? 1. Load ConfigStore
+
+      //? 2. Start DFStore
       if (!dfStore.isRunning) {
         console.log("Starting dfStore");
         dfStore.start();
@@ -263,15 +268,44 @@
 
       //3. Start CompassStore
       //4 Load DF Setting
+      try {
+        const savedDFSettings = await getDFSettings();
+        const centerFreq = Number(savedDFSettings.center_freq || 0);
+        signalState.setFrequency(centerFreq);
+
+        signalState.setGain(Number(savedDFSettings.uniform_gain || 0));
+        signalState.setStationName(savedDFSettings.station_id);
+
+        // setAntenna for initial freq
+        if (centerFreq > 0) {
+          const antSpace = centerFreq >= 250 ? 0.25 : 0.45;
+          await handleSetAntenna(antSpace);
+        }
+
+        console.log("Initial settings loaded:", savedDFSettings);
+      } catch (error) {
+        console.log("Failed to load initial setting config:", error);
+      }
+      console.log("App initialization completed");
     }
 
     initialize();
     return async () => {
-      //stop frequency debounce
-      //stop dfStore
+      if (frequencyDebounceTimer) {
+        clearTimeout(frequencyDebounceTimer);
+        frequencyDebounceTimer = null;
+      }
+
       dfStore.stop();
+      // stop compass listening
 
       //stop udp listening
+      try {
+        const result = await udpStore.stopListening();
+        console.log("Parent destroy:", result);
+      } catch (err) {
+        console.log("UDP stop error:", err.message);
+      }
     };
   });
 </script>
