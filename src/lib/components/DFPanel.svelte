@@ -143,7 +143,7 @@
     if (signalState.autoMode) {
       if (!udpState.isListening) {
         udpStore
-          .startListening(55555)
+          .startListening(49876)
           .then((result) => console.log("UDP started:", result))
           .catch((error) => console.log("UDP error:", error.message));
       }
