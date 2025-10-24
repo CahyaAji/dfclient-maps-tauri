@@ -5,6 +5,7 @@
   import StatusDF from "./StatusDF.svelte";
   import { udpState, udpStore } from "../stores/udpStore.svelte";
   import { signalState } from "../stores/signalState.svelte";
+  import { compassStore } from "../stores/compassStore.svelte";
   import {
     getDFSettings,
     setAntenna,
@@ -257,7 +258,7 @@
 
       //? 1. Load ConfigStore
 
-      //? 2. Start DFStore
+      //2. Start DFStore
       if (!dfStore.isRunning) {
         console.log("Starting dfStore");
         dfStore.start();
@@ -267,6 +268,14 @@
       }
 
       //3. Start CompassStore
+      try {
+        if (!compassStore.isRunning) {
+          compassStore.start();
+          console.log("Compass Store started - will run until app closes");
+        }
+      } catch (error) {
+        console.log("Error starting compass store:", error);
+      }
       //4 Load DF Setting
       try {
         const savedDFSettings = await getDFSettings();
@@ -290,14 +299,17 @@
     }
 
     initialize();
+
     return async () => {
       if (frequencyDebounceTimer) {
         clearTimeout(frequencyDebounceTimer);
         frequencyDebounceTimer = null;
       }
 
+      // stop df store
       dfStore.stop();
       // stop compass listening
+      compassStore.stop();
 
       //stop udp listening
       try {
