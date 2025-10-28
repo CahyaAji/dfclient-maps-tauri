@@ -6,7 +6,7 @@
   import { dfStore } from "../stores/dfStore.svelte";
 
   const EARTH_RADIUS = 6371000;
-  const LINE_LENGTH = 3000;
+  const LINE_LENGTH = 10000;
 
   let mapDiv: HTMLDivElement;
   let map: maplibregl.Map | null = null;
