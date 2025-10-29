@@ -1,9 +1,12 @@
 <div class="container">
     <div class="compass-display">
         <div class="circle"></div>
-        <div class="cmps-value">--</div>
     </div>
-    <div class="compass-correction">ini correction</div>
+    <div class="compass-value">
+        <div class="cmps-value">--</div>
+        <button>Calibrate</button>
+        <button disabled>Set</button>
+    </div>
 </div>
 
 <style>
@@ -22,9 +25,14 @@
         justify-content: center;
         align-items: center;
         display: flex;
-        margin: 4px auto 0;
+        margin: 8px auto;
         border-radius: 50%;
         border: 2px solid white;
+    }
+    .compass-value {
+        margin: auto;
+        display: flex;
+        flex-direction: column;
     }
     .cmps-value {
         width: 80px;
@@ -36,7 +44,8 @@
         padding: 4px 8px;
         color: white;
     }
-    .compass-correction {
-        background-color: pink;
+    .compass-value > button {
+        margin: 2px auto;
+        padding: 4px 8px;
     }
 </style>
