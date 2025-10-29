@@ -16,7 +16,7 @@
     lat1: number,
     lon1: number,
     bearingDeg: number,
-    distance: number
+    distance: number,
   ) {
     const bearing = (bearingDeg * Math.PI) / 180;
     const lat1Rad = (lat1 * Math.PI) / 180;
@@ -26,7 +26,7 @@
       Math.sin(lat1Rad) * Math.cos(distance / EARTH_RADIUS) +
         Math.cos(lat1Rad) *
           Math.sin(distance / EARTH_RADIUS) *
-          Math.cos(bearing)
+          Math.cos(bearing),
     );
 
     const lon2Rad =
@@ -36,7 +36,7 @@
           Math.sin(distance / EARTH_RADIUS) *
           Math.cos(lat1Rad),
         Math.cos(distance / EARTH_RADIUS) -
-          Math.sin(lat1Rad) * Math.sin(lat2Rad)
+          Math.sin(lat1Rad) * Math.sin(lat2Rad),
       );
 
     const lat2 = (lat2Rad * 180) / Math.PI;
@@ -51,30 +51,41 @@
 
     map = new maplibregl.Map({
       container: mapDiv,
+
+      // view normal
       // style:
       //   "https://api.maptiler.com/maps/openstreetmap/style.json?key=fB2eDjoDg2nlel5Kw6ym",
-      style: {
-        version: 8,
-        sources: {
-          satellite: {
-            type: "raster",
-            tiles: [
-              `https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=aUOEn1bA48mz3xc3pL4N`,
-            ],
-            tileSize: 256,
-          },
-        },
-        layers: [{ id: "satellite", type: "raster", source: "satellite" }],
-      },
+
+      //view satelitte
+      // style: {
+      //   version: 8,
+      //   sources: {
+      //     satellite: {
+      //       type: "raster",
+      //       tiles: [
+      //         `https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=aUOEn1bA48mz3xc3pL4N`,
+      //       ],
+      //       tileSize: 256,
+      //     },
+      //   },
+      //   layers: [{ id: "satellite", type: "raster", source: "satellite" }],
+      // },
+
+      //view hybrid
+      style:
+        "https://api.maptiler.com/maps/hybrid/style.json?key=aUOEn1bA48mz3xc3pL4N",
       center: [110.4406, -7.7774],
       zoom: 13,
+      maxZoom: 17,
       attributionControl: false,
     });
 
-    map.on("load", () => {
+    //api.maptiler.com/maps/hybrid/style.json?
+
+    https: map.on("load", () => {
       map.addControl(
         new maplibregl.AttributionControl({ compact: false }),
-        "bottom-left"
+        "bottom-left",
       );
 
       const nav = new maplibregl.NavigationControl();
@@ -155,7 +166,7 @@
     if (!user || angle === null || angle === undefined || isNaN(angle)) {
       if (map) {
         const lineSrc = map.getSource(
-          "bearing-line"
+          "bearing-line",
         ) as maplibregl.GeoJSONSource;
         if (lineSrc) {
           lineSrc.setData({
@@ -186,7 +197,7 @@
       if (!map) return;
 
       const userSrc = map.getSource(
-        "user-location"
+        "user-location",
       ) as maplibregl.GeoJSONSource;
       if (userSrc) {
         userSrc.setData({
