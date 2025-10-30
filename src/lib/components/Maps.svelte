@@ -1,4 +1,6 @@
 <script lang="ts">
+  // DEPRECATED, change to MapsPanel
+
   import "maplibre-gl/dist/maplibre-gl.css";
   import maplibregl from "maplibre-gl";
   import { onMount, onDestroy } from "svelte";
@@ -55,21 +57,6 @@
       // view normal
       // style:
       //   "https://api.maptiler.com/maps/openstreetmap/style.json?key=fB2eDjoDg2nlel5Kw6ym",
-
-      //view satelitte
-      // style: {
-      //   version: 8,
-      //   sources: {
-      //     satellite: {
-      //       type: "raster",
-      //       tiles: [
-      //         `https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=aUOEn1bA48mz3xc3pL4N`,
-      //       ],
-      //       tileSize: 256,
-      //     },
-      //   },
-      //   layers: [{ id: "satellite", type: "raster", source: "satellite" }],
-      // },
 
       //view hybrid
       style:
@@ -224,6 +211,8 @@
     });
   });
 </script>
+
+// deprecated, changes to MapsPanel
 
 <div bind:this={mapDiv} id="map"></div>
 
