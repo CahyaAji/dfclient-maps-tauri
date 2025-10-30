@@ -16,6 +16,8 @@ class LocationStore {
     if (!("geolocation" in navigator)) {
       this.error = "Geolocation API not supported";
       this.hasHardware = false;
+      console.warn("❌ Geolocation API not available, using IP fallback");
+      this.fallbackIP();
       return;
     }
 
@@ -45,19 +47,20 @@ class LocationStore {
         if (acc > 100) this.hasHardware = false;
       },
       (err) => {
+        console.error("📡 Geolocation error:", err.code, err.message);
         this.error = err.message;
         this.isLoading = false;
         this.hasHardware = false;
 
-        // optional: fallback to IP-based lookup if location fails
-        if (err.code === err.POSITION_UNAVAILABLE) {
+        // Fallback to IP-based location on any geolocation error
+        // This is especially important for Linux/macOS where permissions may not work
+        if (
+          err.code === err.PERMISSION_DENIED ||
+          err.code === err.POSITION_UNAVAILABLE
+        ) {
+          console.warn("⚠️ GPS unavailable (code: " + err.code + "), falling back to IP location");
           this.fallbackIP();
         }
-
-        // error di linux & macos (no permission asked)
-        // if (err.code === err.PERMISSION_DENIED) {
-        //   this.fallbackIP();
-        // }
       },
       {
         enableHighAccuracy: true,
@@ -85,13 +88,14 @@ class LocationStore {
 
   async fallbackIP() {
     try {
+      console.log("🌐 Fetching IP-based location...");
       const res = await fetch("https://ipapi.co/json/");
       const j = await res.json();
 
       this.data = {
         lat: j.latitude,
         lon: j.longitude,
-        acc: 1000,
+        acc: 5000, // IP location is very inaccurate
         speed: 0,
         heading: 0,
         timestamp: Date.now(),
@@ -100,9 +104,11 @@ class LocationStore {
       this.error = null;
       this.isLoading = false;
       this.hasHardware = false;
-      console.log("🌐 Using IP fallback location");
+      console.log("✅ Using IP fallback location:", j.city, j.country_name);
     } catch (e) {
-      this.error = "Failed to get IP location: " + e.message;
+      console.error("❌ IP fallback failed:", e);
+      this.error = "Failed to get location: " + e.message;
+      this.isLoading = false;
     }
   }
 }
