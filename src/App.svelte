@@ -1,6 +1,5 @@
 <script>
   import DFPanel from "./lib/components/DFPanel.svelte";
-  import Maps from "./lib/components/Maps.svelte";
   import MapsPanel from "./lib/components/MapsPanel.svelte";
 
   import { isTauriRuntime } from "./lib/utils/devhelper";

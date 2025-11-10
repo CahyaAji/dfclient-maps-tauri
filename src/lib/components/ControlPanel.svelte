@@ -1,6 +1,5 @@
 <script>
   import CompassSetup from "./CompassSetup.svelte";
-  import Compass from "./CompassSetup.svelte";
   import FreqGainSetup from "./FreqGainSetup.svelte";
   import GPSSetup from "./GPSSetup.svelte";
   import Option from "./Option.svelte";
