@@ -338,7 +338,6 @@
     right: 8px;
     width: 320px;
     background-color: transparent;
-    border: 1px solid #ccc;
     border-radius: 4px;
   }
 </style>

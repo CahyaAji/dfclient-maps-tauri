@@ -368,7 +368,7 @@
                 <path d="M3 12h18M12 3v18" />
                 <circle cx="12" cy="12" r="3" />
             </svg>
-            <span>Hybrid</span>
+            <span>Satellite</span>
         </button>
     </div>
 </div>
