@@ -61,7 +61,7 @@
     </div>
     {#if compassStore.data && compassStore.data !== undefined && compassStore.data !== null}
       <div class="cmps-value">
-        {Math.round(compassStore.data + compassOffset)}°
+        {(Math.round(compassStore.data + compassOffset) + 360) % 360}°
       </div>
     {:else}
       <div class="cmps-value">--</div>
