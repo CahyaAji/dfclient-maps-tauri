@@ -25,6 +25,31 @@
         hybrid: "https://api.maptiler.com/maps/hybrid/style.json?key=aUOEn1bA48mz3xc3pL4N",
     };
 
+    function zoomToUserLocation() {
+        if (!map) {
+            console.log("⚠️ Map not initialized");
+            return;
+        }
+
+        const user = locationStore.data;
+        if (!user || !user.lat || !user.lon) {
+            console.log("⚠️ User location not available");
+            return;
+        }
+
+        const { lat, lon } = user;
+        
+        // Smoothly fly to user location
+        map.flyTo({
+            center: [lon, lat],
+            zoom: 15,
+            essential: true,
+            duration: 1000 // Animation duration in milliseconds
+        });
+
+        console.log("📍 Zooming to user location:", { lat, lon });
+    }
+
     function destinationPoint(
         lat1: number,
         lon1: number,
@@ -180,13 +205,17 @@
         map = new maplibregl.Map({
             container: mapDiv,
             style: MAP_STYLES.normal,
-            center: [110.4406, -7.7774],
-            zoom: 13,
+            // center: [110.4406, -7.7774],
+            // zoom: 13,
             maxZoom: 17,
             attributionControl: false,
         });
 
         map.on("load", () => {
+            // Start GPS tracking
+            locationStore.start();
+            console.log("📡 Location tracking started");
+
             isMapLoaded = true;
 
             map!.addControl(
@@ -200,9 +229,9 @@
             // Initialize map layers
             initializeMapLayers();
 
-            // Start GPS tracking
-            locationStore.start();
-            console.log("📡 Location tracking started");
+            // const { lat, lon } = locationStore.data;
+            // console.log("latlon " + lat + " , " + lon);
+            // map!.setCenter( [lon, lat]).setZoom(13);
             console.log("✅ Map loaded, ready for location updates");
         });
     });
@@ -330,6 +359,9 @@
 
     <!-- View Toggle Buttons -->
     <div class="view-controls">
+        <button class="loc-button" onclick={zoomToUserLocation}>
+            <img src="/src/assets/icons8-my-location-32.png" alt="user location">
+        </button>
         <button
             class="view-button"
             class:active={currentView === "normal"}
@@ -395,6 +427,28 @@
         flex-direction: column;
         gap: 8px;
         z-index: 1;
+    }
+
+    .loc-button {
+        display: flex;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 0;
+    }
+
+    .loc-button:hover {
+        background: #f5f5f5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .loc-button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     .view-button {
