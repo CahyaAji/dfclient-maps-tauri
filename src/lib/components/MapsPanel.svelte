@@ -92,7 +92,7 @@
   function initializeMapLayers() {
     if (!map) return;
 
-    // User position marker
+    // User position marker - initialize with empty geometry
     if (!map.getSource("user-location")) {
       map.addSource("user-location", {
         type: "geojson",
@@ -101,7 +101,7 @@
           properties: {},
           geometry: {
             type: "Point",
-            coordinates: [110.4406, -7.7774],
+            coordinates: [], // Empty coordinates - will be set when data arrives
           },
         },
       });
@@ -119,7 +119,7 @@
       });
     }
 
-    // Direction line
+    // Direction line - initialize with empty geometry
     if (!map.getSource("bearing-line")) {
       map.addSource("bearing-line", {
         type: "geojson",
@@ -128,10 +128,7 @@
           properties: {},
           geometry: {
             type: "LineString",
-            coordinates: [
-              [110.4406, -7.7774],
-              [110.9, -7.9],
-            ],
+            coordinates: [], // Empty coordinates - will be set when data arrives
           },
         },
       });
@@ -424,6 +421,7 @@
     }
 
     const user = locationStore.data;
+
     if (!user || !user.lat || !user.lon) {
       console.log("⚠️ User location not available");
       return;
@@ -431,6 +429,7 @@
 
     const { lat, lon } = user;
 
+    // Zoom to user location
     map.flyTo({
       center: [lon, lat],
       zoom: 15,
@@ -439,6 +438,27 @@
     });
 
     console.log("📍 Zooming to user location:", { lat, lon });
+
+    // Only draw the user marker (no angle/direction line)
+    if (isMapLoaded) {
+      console.log("✅ Drawing user marker only");
+      const userSrc = map.getSource(
+        "user-location"
+      ) as maplibregl.GeoJSONSource;
+      if (userSrc) {
+        userSrc.setData({
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Point",
+            coordinates: [lon, lat],
+          },
+        });
+      }
+
+      // Store location but don't update lastAngle
+      lastUserLocation = { lat, lon };
+    }
   }
 
   function toggleMarkerList() {
@@ -658,26 +678,61 @@
     console.log("📍 Picked coordinates:", { lat, lng });
   }
 
-  // Update position (optimized with throttling)
+  // Update position (optimized with throttling) - FIXED VERSION
   $effect(() => {
     const user = locationStore.data;
     const angle = dfStore.data?.heading;
 
-    if (!map || !isMapLoaded) return;
+    console.log(
+      "🔄 Effect triggered - user:",
+      user,
+      "angle:",
+      angle,
+      "isMapLoaded:",
+      isMapLoaded
+    );
 
-    // Clear line if no valid data
-    if (!user || angle === null || angle === undefined || isNaN(angle)) {
+    if (!map || !isMapLoaded) {
+      console.log("⚠️ Effect aborted - map not ready");
+      return;
+    }
+
+    // Don't draw anything if we don't have valid data
+    if (
+      !user ||
+      !user.lat ||
+      !user.lon ||
+      angle === null ||
+      angle === undefined ||
+      isNaN(angle)
+    ) {
+      console.log("⚠️ No valid data yet, clearing visualizations");
       lastUserLocation = null;
       lastAngle = null;
 
+      const userSrc = map.getSource(
+        "user-location"
+      ) as maplibregl.GeoJSONSource;
       const lineSrc = map.getSource("bearing-line") as maplibregl.GeoJSONSource;
+
+      if (userSrc) {
+        userSrc.setData({
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Point",
+            coordinates: [], // Empty - no marker shown
+          },
+        });
+      }
+
       if (lineSrc) {
         lineSrc.setData({
           type: "Feature",
           properties: {},
           geometry: {
             type: "LineString",
-            coordinates: [],
+            coordinates: [], // Empty - no line shown
           },
         });
       }
@@ -687,7 +742,10 @@
     // Throttle updates to 500ms
     const now = Date.now();
     const elapsed = now - lastlocUpdate;
-    if (elapsed < 500) return;
+    if (elapsed < 500) {
+      console.log("⏱️ Throttled - skipping update");
+      return;
+    }
     lastlocUpdate = now;
 
     const { lat, lon } = user;
@@ -695,7 +753,12 @@
     // Store last known position and angle
     lastUserLocation = { lat, lon };
     lastAngle = angle;
-    console.log("Storing position:", lastUserLocation, "angle:", lastAngle);
+    console.log(
+      "✅ Storing and updating position:",
+      lastUserLocation,
+      "angle:",
+      lastAngle
+    );
 
     updateMarkers(lat, lon, angle);
   });
@@ -1149,7 +1212,7 @@
   .view-controls {
     position: absolute;
     top: 10px;
-    left: 10px;
+    left: 60px; /* Add padding to avoid MapLibre zoom controls */
     right: 10px;
     display: flex;
     flex-direction: row;
@@ -1543,6 +1606,10 @@
 
   /* Responsive adjustments */
   @media (max-width: 768px) {
+    .view-controls {
+      left: 50px; /* Reduce padding on mobile */
+    }
+
     .view-button-compact span {
       display: none;
     }
