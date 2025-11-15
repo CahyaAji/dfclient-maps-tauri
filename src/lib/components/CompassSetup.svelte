@@ -1,9 +1,10 @@
 <script>
   import { compassStore } from "../stores/compassStore.svelte";
-  import { configStore } from "../stores/Config.Store.svelte";
+  import { configStore } from "../stores/ConfigStore.svelte";
 
   let inputOffset = $state(0);
   let errorMessage = $state("");
+  let isSaving = $state(false); // Add this flag
 
   let compassOffset = $derived(configStore.compassOffset);
 
@@ -25,9 +26,12 @@
       return;
     }
 
+    isSaving = true; // Set flag before save
     const result = await configStore.setCompassOffset(inputOffset);
+    isSaving = false; // Clear flag after save
+    
     if (result.success) {
-      console.log("Compass offset updated successfully");
+      console.log("Compass offset updated successfully: " + inputOffset);
     } else {
       console.error("Failed to update compass offset:", result.error);
       errorMessage = "Error: Gagal mengatur offset";
@@ -38,7 +42,10 @@
   }
 
   $effect(() => {
-    inputOffset = compassOffset;
+    // Only sync from store when NOT saving
+    if (!isSaving) {
+      inputOffset = compassOffset;
+    }
   });
 </script>
 

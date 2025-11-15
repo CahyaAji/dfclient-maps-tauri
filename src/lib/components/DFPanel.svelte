@@ -11,6 +11,7 @@
     setAntenna,
     setFreqGainApi,
   } from "../utils/api_handler";
+  import { configStore } from "../stores/configStore.svelte";
 
   let appInitialized = false;
   let frequencyDebounceTimer = null;
@@ -257,6 +258,22 @@
       appInitialized = true;
 
       //? 1. Load ConfigStore
+      try {
+        const configResult = await configStore.load();
+        if (configResult.success) {
+          console.log(
+            "configStore loaded succesfully:",
+            configStore.allSettings
+          );
+        } else {
+          console.log(
+            "Config load failed, using defaults:",
+            configResult.error
+          );
+        }
+      } catch (error) {
+        console.log("error loading configStore:", error);
+      }
 
       //2. Start DFStore
       if (!dfStore.isRunning) {
