@@ -4,9 +4,13 @@
   import { onMount, onDestroy } from "svelte";
   import { locationStore } from "../stores/locationStore.svelte.js";
   import { dfStore } from "../stores/dfStore.svelte";
+  import { compassStore } from "../stores/compassStore.svelte.js";
+  import { configStore } from "../stores/configStore.svelte.js";
 
   const EARTH_RADIUS = 6371000;
   const LINE_LENGTH = 10000;
+
+  let compassOffset = $derived(configStore.compassOffset);
 
   // Map view types
   type MapView = "normal" | "hybrid";
@@ -699,7 +703,7 @@
   // Update position (optimized with throttling) - FIXED VERSION
   $effect(() => {
     const user = locationStore.data;
-    const angle = dfStore.data?.heading;
+    const angle = (360 + dfStore.data?.heading + compassStore.data + compassOffset) % 360;
 
     console.log(
       "🔄 Effect triggered - user:",
