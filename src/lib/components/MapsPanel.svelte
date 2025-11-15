@@ -19,6 +19,7 @@
     lat: number;
     lon: number;
     angle: number;
+    type: "direction" | "point"; // New: marker type
   };
 
   let mapDiv: HTMLDivElement;
@@ -42,6 +43,7 @@
     lat: "",
     lon: "",
     angle: "",
+    type: "point" as "direction" | "point", // Default to point marker
   });
 
   // Map picking state
@@ -158,6 +160,9 @@
     const lineSourceId = `marker-line-${marker.id}`;
     const lineLayerId = `marker-line-layer-${marker.id}`;
 
+    // Choose color based on marker type
+    const markerColor = marker.type === "point" ? "#4CAF50" : "#ff6b6b";
+
     // Add marker point
     if (!map.getSource(sourceId)) {
       map.addSource(sourceId, {
@@ -178,7 +183,7 @@
         source: sourceId,
         paint: {
           "circle-radius": 10,
-          "circle-color": "#ff6b6b",
+          "circle-color": markerColor,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",
         },
@@ -203,40 +208,42 @@
       });
     }
 
-    // Add direction line
-    const endPoint = destinationPoint(
-      marker.lat,
-      marker.lon,
-      marker.angle,
-      LINE_LENGTH
-    );
+    // Only add direction line for "direction" type markers
+    if (marker.type === "direction") {
+      const endPoint = destinationPoint(
+        marker.lat,
+        marker.lon,
+        marker.angle,
+        LINE_LENGTH
+      );
 
-    if (!map.getSource(lineSourceId)) {
-      map.addSource(lineSourceId, {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "LineString",
-            coordinates: [
-              [marker.lon, marker.lat],
-              [endPoint.lon, endPoint.lat],
-            ],
+      if (!map.getSource(lineSourceId)) {
+        map.addSource(lineSourceId, {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [marker.lon, marker.lat],
+                [endPoint.lon, endPoint.lat],
+              ],
+            },
           },
-        },
-      });
+        });
 
-      map.addLayer({
-        id: lineLayerId,
-        type: "line",
-        source: lineSourceId,
-        paint: {
-          "line-color": "#ff6b6b",
-          "line-width": 2,
-          "line-dasharray": [2, 2],
-        },
-      });
+        map.addLayer({
+          id: lineLayerId,
+          type: "line",
+          source: lineSourceId,
+          paint: {
+            "line-color": markerColor,
+            "line-width": 2,
+            "line-dasharray": [2, 2],
+          },
+        });
+      }
     }
   }
 
@@ -486,6 +493,7 @@
     }
     editForm.title = "";
     editForm.angle = "";
+    editForm.type = "point"; // Default to point marker
   }
 
   function startEditingMarker(marker: CustomMarker) {
@@ -498,6 +506,7 @@
       lat: marker.lat.toString(),
       lon: marker.lon.toString(),
       angle: marker.angle.toString(),
+      type: marker.type,
     };
   }
 
@@ -509,6 +518,7 @@
       lat: "",
       lon: "",
       angle: "",
+      type: "point",
     };
     stopPickingFromMap();
   }
@@ -524,8 +534,14 @@
       return;
     }
 
-    if (isNaN(lat) || isNaN(lon) || isNaN(angle)) {
-      alert("Please enter valid numbers for latitude, longitude, and angle");
+    if (isNaN(lat) || isNaN(lon)) {
+      alert("Please enter valid numbers for latitude and longitude");
+      return;
+    }
+
+    // Only validate angle for direction markers
+    if (editForm.type === "direction" && isNaN(angle)) {
+      alert("Please enter a valid angle for direction marker");
       return;
     }
 
@@ -536,7 +552,8 @@
         title: editForm.title,
         lat,
         lon,
-        angle,
+        angle: editForm.type === "direction" ? angle : 0,
+        type: editForm.type,
       };
 
       customMarkers = [newMarker, ...customMarkers];
@@ -556,7 +573,8 @@
           title: editForm.title,
           lat,
           lon,
-          angle,
+          angle: editForm.type === "direction" ? angle : 0,
+          type: editForm.type,
         };
 
         addMarkerToMap(customMarkers[markerIndex]);
@@ -802,7 +820,10 @@
       onclick={zoomToUserLocation}
       title="Zoom to my location"
     >
-      <img src="/src/assets/icons8-my-location-32.png" alt="user location" />
+      <svg width="40" height="30">
+        <ellipse stroke="#000" ry="10" rx="10" cy="15" cx="20" fill="#fff" />
+        <ellipse ry="7" rx="7" cy="15" cx="20" fill="#38c9c9" />
+      </svg>
     </button>
 
     <button
@@ -893,6 +914,49 @@
         {#if isAddingNew}
           <div class="marker-item editing">
             <div class="edit-form">
+              <!-- Marker Type Selector -->
+              <div class="form-row type-selector">
+                <button
+                  class="type-button"
+                  class:active={editForm.type === "point"}
+                  onclick={() => (editForm.type = "point")}
+                  type="button"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  Point Marker
+                </button>
+                <button
+                  class="type-button"
+                  class:active={editForm.type === "direction"}
+                  onclick={() => (editForm.type = "direction")}
+                  type="button"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                    <path d="M12 2v8m0 0l3-3m-3 3l-3-3" />
+                  </svg>
+                  Direction Marker
+                </button>
+              </div>
+
               <div class="form-row">
                 <input
                   type="text"
@@ -925,6 +989,7 @@
                     ? stopPickingFromMap
                     : startPickingFromMap}
                   title="Pick from map"
+                  type="button"
                 >
                   <svg
                     width="18"
@@ -938,20 +1003,26 @@
                     <circle cx="12" cy="10" r="3" />
                   </svg>
                 </button>
-                <input
-                  type="number"
-                  step="any"
-                  bind:value={editForm.angle}
-                  placeholder="Angle"
-                  class="input-angle"
-                />
+                {#if editForm.type === "direction"}
+                  <input
+                    type="number"
+                    step="any"
+                    bind:value={editForm.angle}
+                    placeholder="Angle"
+                    class="input-angle"
+                  />
+                {/if}
               </div>
               <div class="form-actions">
-                <button class="btn-cancel-inline" onclick={cancelEdit}
-                  >Cancel</button
+                <button
+                  class="btn-cancel-inline"
+                  onclick={cancelEdit}
+                  type="button">Cancel</button
                 >
-                <button class="btn-save-inline" onclick={saveMarker}
-                  >Save</button
+                <button
+                  class="btn-save-inline"
+                  onclick={saveMarker}
+                  type="button">Save</button
                 >
               </div>
             </div>
@@ -983,6 +1054,53 @@
               {#if editingMarkerId === marker.id}
                 <!-- Edit Mode -->
                 <div class="edit-form">
+                  <!-- Marker Type Selector -->
+                  <div class="form-row type-selector">
+                    <button
+                      class="type-button"
+                      class:active={editForm.type === "point"}
+                      onclick={() => (editForm.type = "point")}
+                      type="button"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                        />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      Point
+                    </button>
+                    <button
+                      class="type-button"
+                      class:active={editForm.type === "direction"}
+                      onclick={() => (editForm.type = "direction")}
+                      type="button"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                        />
+                        <circle cx="12" cy="10" r="3" />
+                        <path d="M12 2v8m0 0l3-3m-3 3l-3-3" />
+                      </svg>
+                      Direction
+                    </button>
+                  </div>
+
                   <div class="form-row">
                     <input
                       type="text"
@@ -1015,6 +1133,7 @@
                         ? stopPickingFromMap
                         : startPickingFromMap}
                       title="Pick from map"
+                      type="button"
                     >
                       <svg
                         width="18"
@@ -1030,20 +1149,26 @@
                         <circle cx="12" cy="10" r="3" />
                       </svg>
                     </button>
-                    <input
-                      type="number"
-                      step="any"
-                      bind:value={editForm.angle}
-                      placeholder="Angle"
-                      class="input-angle"
-                    />
+                    {#if editForm.type === "direction"}
+                      <input
+                        type="number"
+                        step="any"
+                        bind:value={editForm.angle}
+                        placeholder="Angle"
+                        class="input-angle"
+                      />
+                    {/if}
                   </div>
                   <div class="form-actions">
-                    <button class="btn-cancel-inline" onclick={cancelEdit}
-                      >Cancel</button
+                    <button
+                      class="btn-cancel-inline"
+                      onclick={cancelEdit}
+                      type="button">Cancel</button
                     >
-                    <button class="btn-save-inline" onclick={saveMarker}
-                      >Save</button
+                    <button
+                      class="btn-save-inline"
+                      onclick={saveMarker}
+                      type="button">Save</button
                     >
                   </div>
                 </div>
@@ -1058,7 +1183,7 @@
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
-                      fill="#ff6b6b"
+                      fill={marker.type === "point" ? "#4CAF50" : "#ff6b6b"}
                       stroke="white"
                       stroke-width="2"
                     >
@@ -1071,7 +1196,13 @@
                   <div class="marker-details">
                     <div class="marker-title">{marker.title}</div>
                     <div class="marker-coords">
-                      {marker.lat.toFixed(5)}, {marker.lon.toFixed(5)} • {marker.angle}°
+                      {#if marker.type === "point"}
+                        📍 Lat: {marker.lat.toFixed(6)}, Lon: {marker.lon.toFixed(
+                          6
+                        )}
+                      {:else}
+                        {marker.lat.toFixed(5)}, {marker.lon.toFixed(5)} • {marker.angle}°
+                      {/if}
                     </div>
                   </div>
                 </button>
@@ -1493,6 +1624,43 @@
     flex-direction: column;
     gap: 10px;
     width: 100%;
+  }
+
+  .type-selector {
+    display: flex;
+    gap: 8px;
+  }
+
+  .type-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .type-button:hover {
+    background: #f5f5f5;
+    border-color: #999;
+  }
+
+  .type-button.active {
+    background: #e3f2fd;
+    border-color: #007cbf;
+    color: #007cbf;
+  }
+
+  .type-button.active svg {
+    stroke: #007cbf;
   }
 
   .form-row {
