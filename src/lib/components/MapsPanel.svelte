@@ -703,7 +703,8 @@
   // Update position (optimized with throttling) - FIXED VERSION
   $effect(() => {
     const user = locationStore.data;
-    const angle = (360 + dfStore.data?.heading + compassStore.data + compassOffset) % 360;
+    const angle =
+      (360 + dfStore.data?.heading + compassStore.data + compassOffset) % 360;
 
     console.log(
       "🔄 Effect triggered - user:",
@@ -719,16 +720,9 @@
       return;
     }
 
-    // Don't draw anything if we don't have valid data
-    if (
-      !user ||
-      !user.lat ||
-      !user.lon ||
-      angle === null ||
-      angle === undefined ||
-      isNaN(angle)
-    ) {
-      console.log("⚠️ No valid data yet, clearing visualizations");
+    // If no user location at all, clear everything
+    if (!user || !user.lat || !user.lon) {
+      console.log("⚠️ No user location, clearing visualizations");
       lastUserLocation = null;
       lastAngle = null;
 
@@ -743,7 +737,7 @@
           properties: {},
           geometry: {
             type: "Point",
-            coordinates: [], // Empty - no marker shown
+            coordinates: [],
           },
         });
       }
@@ -754,12 +748,19 @@
           properties: {},
           geometry: {
             type: "LineString",
-            coordinates: [], // Empty - no line shown
+            coordinates: [],
           },
         });
       }
       return;
     }
+
+    // We have user location - always show it
+    const { lat, lon } = user;
+
+    // Check if angle is valid
+    const hasValidAngle =
+      angle !== null && angle !== undefined && !isNaN(angle);
 
     // Throttle updates to 500ms
     const now = Date.now();
@@ -770,19 +771,51 @@
     }
     lastlocUpdate = now;
 
-    const { lat, lon } = user;
-
-    // Store last known position and angle
+    // Store last known position
     lastUserLocation = { lat, lon };
-    lastAngle = angle;
-    console.log(
-      "✅ Storing and updating position:",
-      lastUserLocation,
-      "angle:",
-      lastAngle
-    );
 
-    updateMarkers(lat, lon, angle);
+    if (hasValidAngle) {
+      lastAngle = angle;
+      console.log(
+        "✅ Updating position with angle:",
+        lastUserLocation,
+        "angle:",
+        lastAngle
+      );
+      updateMarkers(lat, lon, angle);
+    } else {
+      // Only update user marker, not the bearing line
+      lastAngle = null;
+      console.log("✅ Updating position without angle:", lastUserLocation);
+
+      const userSrc = map.getSource(
+        "user-location"
+      ) as maplibregl.GeoJSONSource;
+      const lineSrc = map.getSource("bearing-line") as maplibregl.GeoJSONSource;
+
+      if (userSrc) {
+        userSrc.setData({
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Point",
+            coordinates: [lon, lat],
+          },
+        });
+      }
+
+      // Clear the bearing line when no valid angle
+      if (lineSrc) {
+        lineSrc.setData({
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: [],
+          },
+        });
+      }
+    }
   });
 </script>
 
