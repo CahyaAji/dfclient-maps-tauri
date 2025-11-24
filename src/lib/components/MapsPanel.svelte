@@ -329,6 +329,8 @@
     map = new maplibregl.Map({
       container: mapDiv,
       style: MAP_STYLES.normal,
+      center: [122, 0],
+      zoom: 4,
       maxZoom: 17,
       attributionControl: false,
     });
