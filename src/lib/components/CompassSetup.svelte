@@ -1,6 +1,6 @@
 <script>
   import { compassStore } from "../stores/compassStore.svelte";
-  import { configStore } from "../stores/ConfigStore.svelte";
+  import { configStore } from "../stores/configStore.svelte";
 
   let inputOffset = $state(0);
   let errorMessage = $state("");
